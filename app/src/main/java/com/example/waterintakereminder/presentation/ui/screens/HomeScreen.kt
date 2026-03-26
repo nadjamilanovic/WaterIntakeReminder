@@ -17,7 +17,6 @@ import java.util.*
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
 
-    // Pair<Int, String> = (amount, time)
     val intakeList = remember { mutableStateListOf<Pair<Int, String>>() }
 
     Column(
@@ -33,7 +32,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Input
         AddWaterInput(onAdd = { amount ->
             val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
             intakeList.add(amount to currentTime)
@@ -41,7 +39,6 @@ fun HomeScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Lista
         if (intakeList.isEmpty()) {
             Text(
                 text = "No water intake yet",

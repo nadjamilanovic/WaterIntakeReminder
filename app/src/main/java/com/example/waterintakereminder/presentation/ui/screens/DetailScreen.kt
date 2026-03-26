@@ -34,7 +34,6 @@ fun DetailScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Edge case / feedback
         if (lastSaved != null) {
             Text(
                 text = "Last saved: ${lastSaved} ml",

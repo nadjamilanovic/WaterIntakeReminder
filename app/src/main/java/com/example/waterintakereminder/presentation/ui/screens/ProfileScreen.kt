@@ -26,13 +26,11 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // User info
         ProfileInfoItem(title = "Name", value = "Nadja")
         ProfileInfoItem(title = "Daily Goal", value = "2000 ml")
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Stats
         ProfileInfoItem(title = "Total Intakes", value = "15")
         ProfileInfoItem(title = "Average per Day", value = "1800 ml")
     }

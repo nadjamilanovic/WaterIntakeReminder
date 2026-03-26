@@ -14,7 +14,6 @@ import com.example.waterintakereminder.ui.screens.list.components.WaterIntakeLis
 @Composable
 fun ListScreen(modifier: Modifier = Modifier) {
 
-    // Lista: Pair<Int, String> → (amount, time)
     val intakeList = remember {
         mutableStateListOf(
             250 to "08:00",
