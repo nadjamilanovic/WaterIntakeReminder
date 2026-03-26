@@ -1,4 +1,4 @@
-package com.example.waterintakereminder.ui.theme
+package com.example.waterintakereminder.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
