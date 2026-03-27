@@ -26,7 +26,7 @@ fun HomeScreen(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Water Intake Tracker",
+            text = "Water Intake Tracker ",
             style = MaterialTheme.typography.headlineMedium
         )
 
