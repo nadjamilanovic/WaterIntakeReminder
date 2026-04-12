@@ -12,8 +12,9 @@ import androidx.compose.ui.unit.dp
 import com.example.waterintakereminder.ui.screens.list.components.WaterIntakeListItem
 
 @Composable
-fun ListScreen(modifier: Modifier = Modifier) {
-
+fun ListScreen(
+    onItemClick: (Int) -> Unit
+){
     val intakeList = remember {
         mutableStateListOf(
             250 to "08:00",
@@ -21,6 +22,18 @@ fun ListScreen(modifier: Modifier = Modifier) {
             200 to "13:15"
         )
     }
+    ListScreen(
+        intakeList = intakeList,
+        onItemClick = onItemClick
+    )
+}
+@Composable
+private fun ListScreen(
+    intakeList: List<Pair<Int, String>>,
+    onItemClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
+
+) {
 
     Column(
         modifier = modifier
@@ -45,7 +58,8 @@ fun ListScreen(modifier: Modifier = Modifier) {
                 items(intakeList) { intake ->
                     WaterIntakeListItem(
                         amount = intake.first,
-                        time = intake.second
+                        time = intake.second,
+                        onClick = { onItemClick(intake.first) }
                     )
                 }
             }
@@ -56,5 +70,5 @@ fun ListScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun ListScreenPreview() {
-    ListScreen()
+    ListScreen(onItemClick = {})
 }

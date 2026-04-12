@@ -10,9 +10,25 @@ import androidx.compose.ui.unit.dp
 import com.example.waterintakereminder.ui.screens.detail.components.WaterInputField
 
 @Composable
-fun DetailScreen(modifier: Modifier = Modifier) {
+fun DetailScreen(
+    amount: Int
+) {
+    var lastSaved by remember { mutableStateOf<Int?>(amount) }
 
-    var lastSaved by remember { mutableStateOf<Int?>(null) }
+    DetailScreen(
+        lastSaved = lastSaved,
+        onSave = { newAmount ->
+            lastSaved = newAmount
+        }
+    )
+}
+
+@Composable
+private fun DetailScreen(
+    lastSaved: Int?,
+    onSave: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     Column(
         modifier = modifier
@@ -29,7 +45,7 @@ fun DetailScreen(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(16.dp))
 
         WaterInputField { amount ->
-            lastSaved = amount
+            onSave(amount)
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -46,5 +62,5 @@ fun DetailScreen(modifier: Modifier = Modifier) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DetailScreenPreview() {
-    DetailScreen()
+    DetailScreen(amount = 250)
 }

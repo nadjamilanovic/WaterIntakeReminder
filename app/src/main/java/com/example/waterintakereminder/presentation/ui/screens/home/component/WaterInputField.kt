@@ -7,8 +7,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun WaterInputField(onSubmit: (Int) -> Unit) {
+fun WaterInputField(
+    //input
+    onSubmit: (Int) -> Unit) {
 
+    //prebaci state unutar statefull screena
     var input by remember { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
 

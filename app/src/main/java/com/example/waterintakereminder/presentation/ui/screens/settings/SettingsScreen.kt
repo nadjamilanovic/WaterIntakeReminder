@@ -10,10 +10,25 @@ import androidx.compose.ui.unit.dp
 import com.example.waterintakereminder.ui.screens.settings.components.SettingsSwitchItem
 
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier) {
+fun SettingsScreen(){
+    var notificationsEnabled by remember { mutableStateOf(false)}
+    var reminderEnabled by remember { mutableStateOf(false)}
 
-    var notificationsEnabled by remember { mutableStateOf(false) }
-    var reminderEnabled by remember { mutableStateOf(false) }
+    SettingsScreen(
+        notificationsEnabled = notificationsEnabled,
+        reminderEnabled = reminderEnabled,
+        onNotificationsChange = { notificationsEnabled = it},
+        onReminderChange = { reminderEnabled = it}
+    )
+}
+@Composable
+private fun SettingsScreen(
+    notificationsEnabled: Boolean,
+    reminderEnabled: Boolean,
+    onNotificationsChange: (Boolean) -> Unit,
+    onReminderChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
 
     Column(
         modifier = modifier
@@ -32,13 +47,13 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
         SettingsSwitchItem(
             title = "Enable Notifications",
             checked = notificationsEnabled,
-            onCheckedChange = { notificationsEnabled = it }
+            onCheckedChange = { onNotificationsChange(it) }
         )
 
         SettingsSwitchItem(
             title = "Enable Daily Reminder",
             checked = reminderEnabled,
-            onCheckedChange = { reminderEnabled = it }
+            onCheckedChange = { onReminderChange(it) }
         )
     }
 }

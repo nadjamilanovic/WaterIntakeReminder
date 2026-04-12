@@ -10,7 +10,9 @@ import androidx.compose.ui.unit.dp
 import com.example.waterintakereminder.ui.screens.profile.components.ProfileInfoItem
 
 @Composable
-fun ProfileScreen(modifier: Modifier = Modifier) {
+fun ProfileScreen(
+    value: String,
+    modifier: Modifier = Modifier) {
 
     Column(
         modifier = modifier
@@ -26,7 +28,7 @@ fun ProfileScreen(modifier: Modifier = Modifier) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        ProfileInfoItem(title = "Name", value = "Nadja")
+        ProfileInfoItem(title = "Name", value = value)
         ProfileInfoItem(title = "Daily Goal", value = "2000 ml")
 
         Spacer(modifier = Modifier.height(16.dp))
