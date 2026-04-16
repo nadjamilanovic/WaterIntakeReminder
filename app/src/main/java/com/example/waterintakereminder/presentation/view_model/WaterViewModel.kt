@@ -43,6 +43,31 @@ class WaterViewModel : ViewModel() {
         }
     }.asStateFlow()
 
+    val isGoalReached: StateFlow<Boolean> = MutableStateFlow(false).apply {
+        viewModelScope.launch {
+            _intakes.collect { list ->
+                val total = list.sumOf { it.amountMl }
+                value = total >= 2000
+            }
+        }
+    }.asStateFlow()
+
+    val waterCount: StateFlow<Int> = MutableStateFlow(0).apply {
+        viewModelScope.launch {
+            _intakes.collect { list ->
+                value = list.size
+            }
+        }
+    }.asStateFlow()
+
+    val averageAmount: StateFlow<Int> = MutableStateFlow(0).apply {
+        viewModelScope.launch {
+            _intakes.collect { list ->
+                value = if (list.isNotEmpty()) list.sumOf { it.amountMl } / list.size else 0
+            }
+        }
+    }.asStateFlow()
+
     init {
         loadSampleData()
     }

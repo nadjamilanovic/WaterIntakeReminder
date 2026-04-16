@@ -1,18 +1,17 @@
-package com.example.waterintakereminder.ui.screens.detail.components
+package com.example.waterintakereminder.presentation.ui.screens.home.component
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun WaterInputField(
-    //input
     onSubmit: (Int) -> Unit) {
 
-    //prebaci state unutar statefull screena
-    var input by remember { mutableStateOf("") }
+    var input by rememberSaveable { mutableStateOf("") }
     var isError by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxWidth()) {

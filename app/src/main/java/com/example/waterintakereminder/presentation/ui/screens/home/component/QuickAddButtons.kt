@@ -1,4 +1,4 @@
-package com.example.waterintakereminder.ui.screens.home.components
+package com.example.waterintakereminder.presentation.ui.screens.home.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.padding

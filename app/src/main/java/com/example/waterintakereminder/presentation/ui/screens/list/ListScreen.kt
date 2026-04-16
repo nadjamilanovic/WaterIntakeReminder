@@ -1,4 +1,4 @@
-package com.example.waterintakereminder.ui.screens
+package com.example.waterintakereminder.presentation.ui.screens.list
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,34 +7,31 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.waterintakereminder.ui.screens.list.components.WaterIntakeListItem
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.waterintakereminder.presentation.view_model.WaterViewModel
+import com.example.waterintakereminder.presentation.ui.screens.list.component.WaterIntakeListItem
+import com.example.waterintakereminder.data.model.WaterIntake
 
 @Composable
 fun ListScreen(
     onItemClick: (Int) -> Unit
-){
-    val intakeList = remember {
-        mutableStateListOf(
-            250 to "08:00",
-            300 to "10:30",
-            200 to "13:15"
-        )
-    }
-    ListScreen(
-        intakeList = intakeList,
+) {
+    val viewModel: WaterViewModel = viewModel()
+    val intakes by viewModel.intakes.collectAsState()
+
+    ListScreenStateless(
+        intakes = intakes,
         onItemClick = onItemClick
     )
 }
+
 @Composable
-private fun ListScreen(
-    intakeList: List<Pair<Int, String>>,
+private fun ListScreenStateless(
+    intakes: List<WaterIntake>,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
-
 ) {
-
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -48,27 +45,44 @@ private fun ListScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (intakeList.isEmpty()) {
-            Text(
-                text = "No water intake yet",
-                style = MaterialTheme.typography.bodyMedium
-            )
+        if (intakes.isEmpty()) {
+
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            ) {
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "💧",
+                        style = MaterialTheme.typography.displayMedium
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "No water intake yet",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Add your first glass from the home screen!",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                }
+            }
         } else {
             LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                items(intakeList) { intake ->
+                items(intakes) { intake ->
                     WaterIntakeListItem(
-                        amount = intake.first,
-                        time = intake.second,
-                        onClick = { onItemClick(intake.first) }
+                        id = intake.id,
+                        amount = intake.amountMl,
+                        time = intake.time,
+                        isDrank = intake.isDrank,
+                        onClick = { onItemClick(intake.amountMl) }
                     )
                 }
             }
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun ListScreenPreview() {
-    ListScreen(onItemClick = {})
 }

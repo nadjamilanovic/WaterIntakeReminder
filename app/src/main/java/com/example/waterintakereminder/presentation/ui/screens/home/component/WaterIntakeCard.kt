@@ -1,5 +1,4 @@
-package com.example.waterintakereminder.ui.screens.home.components
-
+package com.example.waterintakereminder.presentation.ui.screens.home.component
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.Card
