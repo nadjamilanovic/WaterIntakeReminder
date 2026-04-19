@@ -58,6 +58,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     val nav_version = "2.9.7"
     implementation("androidx.navigation:navigation-compose:$nav_version")
-    implementation("androidx.compose.material:material-icons-extended:1.7.5")
-
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 }

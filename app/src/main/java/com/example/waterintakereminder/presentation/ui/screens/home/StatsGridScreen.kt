@@ -5,37 +5,16 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.waterintakereminder.presentation.view_model.WaterViewModel
 import com.example.waterintakereminder.presentation.ui.screens.home.component.StatCard
-
-
-data class StatCardData(
-    val id: Int,
-    val title: String,
-    val value: String,
-    val icon: String,
-    val color: androidx.compose.ui.graphics.Color
-)
+import com.example.waterintakereminder.presentation.ui.screens.home.util.StatCardData
+import com.example.waterintakereminder.presentation.ui.screens.home.util.getSampleStats
 
 @Composable
 fun StatsGridScreen() {
-    val viewModel: WaterViewModel = viewModel()
-    val totalWater by viewModel.totalWater.collectAsState()
-    val waterCount by viewModel.waterCount.collectAsState()
-    val averageAmount by viewModel.averageAmount.collectAsState()
-    val remainingWater by viewModel.remainingWater.collectAsState()
-
-    val stats = listOf(
-        StatCardData(1, "Total Water", "$totalWater ml", "💧", MaterialTheme.colorScheme.primaryContainer),
-        StatCardData(2, "Total Drinks", "$waterCount", "🥤", MaterialTheme.colorScheme.secondaryContainer),
-        StatCardData(3, "Average", "$averageAmount ml", "📊", MaterialTheme.colorScheme.tertiaryContainer),
-        StatCardData(4, "Remaining", "$remainingWater ml", "🎯", MaterialTheme.colorScheme.primaryContainer)
-    )
+    val stats = getSampleStats()
 
     StatsGridScreenStateless(
         stats = stats

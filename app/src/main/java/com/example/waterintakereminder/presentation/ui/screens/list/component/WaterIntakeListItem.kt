@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun WaterIntakeListItem(
-    id: Int,
     amount: Int,
     time: String,
     isDrank: Boolean,

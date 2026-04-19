@@ -10,13 +10,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-val quickAmounts = listOf(100, 200, 250, 300, 500)
-
 @Composable
 fun QuickAddButtons(
     onQuickAdd: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val quickAmounts = listOf(100, 200, 250, 300, 500)
+
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)

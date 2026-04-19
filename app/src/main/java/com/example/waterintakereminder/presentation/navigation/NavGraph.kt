@@ -17,14 +17,15 @@ import com.example.waterintakereminder.presentation.ui.screens.profile.Achieveme
 import com.example.waterintakereminder.presentation.ui.screens.home.StatsGridScreen
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationTipsScreen
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationInspirationScreen
-
-
+import com.example.waterintakereminder.data.model.WaterIntake
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
+    modifier: Modifier = Modifier,
     startDestination: String = Screen.Home.route,
-    modifier: Modifier = Modifier
+    intakes: List<WaterIntake>,
+    onUpdateIntakes: (List<WaterIntake>) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -42,20 +43,15 @@ fun NavGraph(
         composable(route = Screen.Home.route) {
             HomeScreen(
                 navController = navController,
-                onNavigateToList = { navController.navigate(Screen.AllIntakes.route) },
-                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
-                onNavigateToProfile = {   navController.navigate(Screen.Profile.route) {
-                    launchSingleTop = true
-                } },
-                onNavigateToTips = { navController.navigate(Screen.Tips.route) },
-                onNavigateToInspiration = { navController.navigate(Screen.Inspiration.route) }
-                )
+                intakes = intakes,
+                onUpdateIntakes = onUpdateIntakes
+            )
         }
 
         composable(route = Screen.AllIntakes.route) {
             ListScreen(
                 onItemClick = { amount ->
-                    navController.navigate(Screen.DetailWithArg.passId(amount))
+                    navController.navigate(Screen.DetailWithArg.passData(WaterIntake(0, amount, "", false)))
                 }
             )
         }
@@ -63,12 +59,26 @@ fun NavGraph(
         composable(
             route = Screen.DetailWithArg.route,
             arguments = listOf(
-                navArgument("intakeId") { type = NavType.IntType }
+                navArgument("amountMl") { type = NavType.IntType },
+                navArgument("time") { type = NavType.StringType },
+                navArgument("isDrank") { type = NavType.BoolType },
+                navArgument("id") { type = NavType.IntType }
             )
         ) { backStackEntry ->
-            val intakeId = backStackEntry.arguments?.getInt("intakeId") ?: 0
+            val amountMl = backStackEntry.arguments?.getInt("amountMl") ?: 0
+            val time = backStackEntry.arguments?.getString("time") ?: ""
+            val isDrank = backStackEntry.arguments?.getBoolean("isDrank") ?: false
+            val id = backStackEntry.arguments?.getInt("id") ?: 0
+
+            val intake = WaterIntake(
+                id = id,
+                amountMl = amountMl,
+                time = time,
+                isDrank = isDrank
+            )
+
             DetailScreen(
-                intakeId = intakeId,
+                intake = intake,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
@@ -80,17 +90,21 @@ fun NavGraph(
         composable(route = Screen.Profile.route) {
             ProfileScreen(navController = navController)
         }
+
         composable(route = Screen.Achievements.route) {
             AchievementsHorizontalGridScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
+
         composable(route = Screen.Stats.route) {
             StatsGridScreen()
         }
+
         composable(route = Screen.Tips.route) {
             HydrationTipsScreen()
         }
+
         composable(route = Screen.Inspiration.route) {
             HydrationInspirationScreen()
         }
