@@ -186,7 +186,7 @@ private fun ProfileScreenStateless(
                 )
 
                 TextButton(onClick = onViewAllAchievements) {
-                    Text("View All →")
+                    Text("View All → ")
                 }
             }
 
