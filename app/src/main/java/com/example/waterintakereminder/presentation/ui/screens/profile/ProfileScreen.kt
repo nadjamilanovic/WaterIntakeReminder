@@ -8,50 +8,99 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.waterintakereminder.presentation.navigation.Screen
 import com.example.waterintakereminder.presentation.ui.screens.profile.component.ProfileInfoItem
 import com.example.waterintakereminder.presentation.ui.screens.profile.component.AchievementCard
 import com.example.waterintakereminder.presentation.ui.screens.profile.util.AchievementModel
-import com.example.waterintakereminder.presentation.ui.screens.profile.util.getProfileIntakes
 import com.example.waterintakereminder.presentation.ui.screens.profile.util.getProfileAchievements
 import com.example.waterintakereminder.presentation.ui.components.WaterAppBar
+import com.example.waterintakereminder.presentation.view_model.profile.ProfileViewModel
+import com.example.waterintakereminder.presentation.view_model.profile.ProfileUiState
+import com.example.waterintakereminder.presentation.view_model.profile.ProfileNavigationEvent
 
 @Composable
 fun ProfileScreen(
+    viewModel: ProfileViewModel,
     navController: NavController
 ) {
-    val intakes = getProfileIntakes()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val totalWater = intakes.sumOf { it.amountMl }
-    val waterCount = intakes.size
-    val averageAmount = if (intakes.isNotEmpty()) intakes.sumOf { it.amountMl } / intakes.size else 0
-
-    val userName = "Water Warrior"
-
-    val achievements = getProfileAchievements()
-
-    ProfileScreenStateless(
-        userName = userName,
-        dailyGoal = "2000 ml",
-        totalIntakes = waterCount.toString(),
-        averagePerDay = "$averageAmount ml",
-        totalWater = "$totalWater ml",
-        achievements = achievements,
-        onViewAllAchievements = {
-            navController.navigate(Screen.Achievements.route)
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                ProfileNavigationEvent.Navigate -> {
+                }
+                ProfileNavigationEvent.NavigateBack -> {
+                    navController.popBackStack()
+                }
+            }
         }
-    )
+    }
+
+    when (uiState) {
+        is ProfileUiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is ProfileUiState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Error: ${(uiState as ProfileUiState.Error).message}")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { viewModel.resetUiState() }) {
+                        Text("Retry")
+                    }
+                }
+            }
+        }
+        is ProfileUiState.Success -> {
+            val profileData = (uiState as ProfileUiState.Success).profileData
+            val achievements = getProfileAchievements()
+
+            ProfileScreenStateless(
+                userName = profileData.userName,
+                email = profileData.email,
+                joinDate = profileData.joinDate,
+                dailyGoal = "${profileData.dailyGoal} ml",
+                totalWater = "${profileData.totalWaterConsumed} ml",
+                totalIntakes = profileData.totalIntakes.toString(),
+                averagePerDay = "${profileData.averagePerDay} ml",
+                achievements = achievements,
+                onViewAllAchievements = {
+                    navController.navigate(Screen.Achievements.route)
+                }
+            )
+        }
+        else -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Initializing...")
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileScreenStateless(
     userName: String,
+    email: String,
+    joinDate: String,
     dailyGoal: String,
+    totalWater: String,
     totalIntakes: String,
     averagePerDay: String,
-    totalWater: String,
     achievements: List<AchievementModel>,
     onViewAllAchievements: () -> Unit,
     modifier: Modifier = Modifier
@@ -86,9 +135,14 @@ private fun ProfileScreenStateless(
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Text(
-                        text = "Water Tracker Enthusiast",
+                        text = email,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                    Text(
+                        text = "Member since $joinDate",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                     )
                 }
             }
@@ -115,7 +169,7 @@ private fun ProfileScreenStateless(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     ProfileInfoItem(title = "Total Intakes", value = totalIntakes)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-                    ProfileInfoItem(title = "Average per Intake", value = averagePerDay)
+                    ProfileInfoItem(title = "Average per Day", value = averagePerDay)
                 }
             }
 

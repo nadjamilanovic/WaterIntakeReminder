@@ -18,6 +18,7 @@ import com.example.waterintakereminder.presentation.ui.screens.home.StatsGridScr
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationTipsScreen
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationInspirationScreen
 import com.example.waterintakereminder.data.model.WaterIntake
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun NavGraph(
@@ -88,9 +89,11 @@ fun NavGraph(
         }
 
         composable(route = Screen.Profile.route) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(
+                viewModel = hiltViewModel(),
+                navController = navController
+            )
         }
-
         composable(route = Screen.Achievements.route) {
             AchievementsHorizontalGridScreen(
                 onNavigateBack = { navController.popBackStack() }
