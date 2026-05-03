@@ -19,6 +19,7 @@ import com.example.waterintakereminder.presentation.ui.screens.home.HydrationTip
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationInspirationScreen
 import com.example.waterintakereminder.data.model.WaterIntake
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.waterintakereminder.presentation.view_model.home.HomeViewModel
 
 @Composable
 fun NavGraph(
@@ -43,9 +44,8 @@ fun NavGraph(
 
         composable(route = Screen.Home.route) {
             HomeScreen(
-                navController = navController,
-                intakes = intakes,
-                onUpdateIntakes = onUpdateIntakes
+                viewModel = hiltViewModel(),
+                navController = navController
             )
         }
 
