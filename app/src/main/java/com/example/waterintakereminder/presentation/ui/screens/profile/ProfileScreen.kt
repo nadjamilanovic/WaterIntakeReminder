@@ -14,7 +14,6 @@ import com.example.waterintakereminder.presentation.navigation.Screen
 import com.example.waterintakereminder.presentation.ui.screens.profile.component.ProfileInfoItem
 import com.example.waterintakereminder.presentation.ui.screens.profile.component.AchievementCard
 import com.example.waterintakereminder.presentation.ui.screens.profile.util.AchievementModel
-import com.example.waterintakereminder.presentation.ui.screens.profile.util.getProfileAchievements
 import com.example.waterintakereminder.presentation.ui.components.WaterAppBar
 import com.example.waterintakereminder.presentation.view_model.profile.ProfileViewModel
 import com.example.waterintakereminder.presentation.view_model.profile.ProfileUiState
@@ -26,12 +25,12 @@ fun ProfileScreen(
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val achievements by viewModel.userAchievements.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvent.collect { event ->
             when (event) {
-                ProfileNavigationEvent.Navigate -> {
-                }
+                ProfileNavigationEvent.Navigate -> {}
                 ProfileNavigationEvent.NavigateBack -> {
                     navController.popBackStack()
                 }
@@ -64,7 +63,6 @@ fun ProfileScreen(
         }
         is ProfileUiState.Success -> {
             val profileData = (uiState as ProfileUiState.Success).profileData
-            val achievements = getProfileAchievements()
 
             ProfileScreenStateless(
                 userName = profileData.userName,

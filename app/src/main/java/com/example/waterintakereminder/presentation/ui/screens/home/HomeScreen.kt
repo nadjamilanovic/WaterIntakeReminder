@@ -32,7 +32,7 @@ fun HomeScreen(
     navController: NavController
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val coroutineScope = rememberCoroutineScope()
+    val hydrationTip by viewModel.hydrationTip.collectAsStateWithLifecycle()
 
     var inputText by rememberSaveable { mutableStateOf("") }
     var inputError by remember { mutableStateOf(false) }
@@ -98,6 +98,7 @@ fun HomeScreen(
                 averageAmount = averageAmount,
                 inputValue = inputText,
                 inputError = inputError,
+                hydrationTip = hydrationTip,
                 onAddWater = { viewModel.addWater(it) },
                 onToggleDrank = { viewModel.toggleDrankStatus(it) },
                 onDeleteIntake = { viewModel.deleteIntake(it) },
@@ -128,6 +129,7 @@ private fun HomeScreenStateless(
     averageAmount: Int,
     inputValue: String,
     inputError: Boolean,
+    hydrationTip: String,
     onAddWater: (Int) -> Unit,
     onToggleDrank: (Int) -> Unit,
     onDeleteIntake: (Int) -> Unit,
@@ -176,6 +178,20 @@ private fun HomeScreenStateless(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (hydrationTip.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                ) {
+                    Text(
+                        text = hydrationTip,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)

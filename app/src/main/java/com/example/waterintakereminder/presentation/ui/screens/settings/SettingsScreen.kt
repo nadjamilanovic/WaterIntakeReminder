@@ -3,24 +3,63 @@ package com.example.waterintakereminder.presentation.ui.screens.settings
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.waterintakereminder.presentation.ui.screens.settings.component.SettingsSwitchItem
 import com.example.waterintakereminder.presentation.ui.components.WaterAppBar
+import com.example.waterintakereminder.presentation.view_model.settings.SettingsViewModel
+import com.example.waterintakereminder.presentation.view_model.settings.SettingsUiState
 
 @Composable
-fun SettingsScreen() {
-    var notificationsEnabled by rememberSaveable { mutableStateOf(false) }
-    var reminderEnabled by rememberSaveable { mutableStateOf(false) }
+fun SettingsScreen(
+    viewModel: SettingsViewModel
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    SettingsScreenStateless(
-        notificationsEnabled = notificationsEnabled,
-        reminderEnabled = reminderEnabled,
-        onNotificationsChange = { notificationsEnabled = it },
-        onReminderChange = { reminderEnabled = it }
-    )
+    when (uiState) {
+        is SettingsUiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is SettingsUiState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Error: ${(uiState as SettingsUiState.Error).message}")
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(onClick = { viewModel.resetUiState() }) {
+                        Text("Retry")
+                    }
+                }
+            }
+        }
+        is SettingsUiState.Success -> {
+            val settings = (uiState as SettingsUiState.Success).settings
+
+            SettingsScreenStateless(
+                notificationsEnabled = settings.notificationsEnabled,
+                reminderEnabled = settings.reminderEnabled,
+                onNotificationsChange = { viewModel.updateNotifications(it) },
+                onReminderChange = { viewModel.updateReminder(it) }
+            )
+        }
+        else -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Initializing...")
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

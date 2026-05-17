@@ -8,31 +8,75 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.waterintakereminder.presentation.ui.screens.list.component.WaterIntakeListItem
-import com.example.waterintakereminder.data.model.WaterIntake
-import com.example.waterintakereminder.presentation.ui.screens.home.util.getSampleIntakes
 import com.example.waterintakereminder.presentation.ui.components.WaterAppBar
+import com.example.waterintakereminder.presentation.view_model.list.ListViewModel
+import com.example.waterintakereminder.presentation.view_model.list.ListUiState
+import com.example.waterintakereminder.presentation.view_model.list.ListNavigationEvent
 
 @Composable
 fun ListScreen(
-    onItemClick: (Int) -> Unit
+    viewModel: ListViewModel,
+    onNavigateToDetail: (Int) -> Unit
 ) {
-    var intakes by remember { mutableStateOf<List<WaterIntake>>(emptyList()) }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        intakes = getSampleIntakes()
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                is ListNavigationEvent.NavigateToDetail -> {
+                    onNavigateToDetail(event.amount)
+                }
+                else -> {}
+            }
+        }
     }
 
-    ListScreenStateless(
-        intakes = intakes,
-        onItemClick = onItemClick
-    )
+    when (uiState) {
+        is ListUiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is ListUiState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Error: ${(uiState as ListUiState.Error).message}")
+                    Button(onClick = { viewModel.resetUiState() }) {
+                        Text("Retry")
+                    }
+                }
+            }
+        }
+        is ListUiState.Success -> {
+            val intakes = (uiState as ListUiState.Success).intakes
+            ListScreenStateless(
+                intakes = intakes,
+                onItemClick = { viewModel.onItemClick(it) }
+            )
+        }
+        else -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Initializing...")
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ListScreenStateless(
-    intakes: List<WaterIntake>,
+    intakes: List<com.example.waterintakereminder.data.model.WaterIntake>,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
