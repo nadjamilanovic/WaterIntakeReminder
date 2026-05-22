@@ -15,9 +15,9 @@ import com.example.waterintakereminder.presentation.theme.WaterIntakeReminderThe
 import com.example.waterintakereminder.presentation.navigation.NavGraph
 import com.example.waterintakereminder.presentation.navigation.Screen
 import com.example.waterintakereminder.presentation.navigation.bottom_nav.BottomNavItems
-import com.example.waterintakereminder.data.model.WaterIntake
-import com.example.waterintakereminder.presentation.ui.screens.home.util.getSampleIntakes
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,12 +38,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun WaterIntakeApp() {
     val navController = rememberNavController()
-
-    var intakes by remember { mutableStateOf<List<WaterIntake>>(emptyList()) }
-
-    LaunchedEffect(Unit) {
-        intakes = getSampleIntakes()
-    }
 
     val navItems = BottomNavItems.items
 
@@ -82,9 +76,7 @@ fun WaterIntakeApp() {
         NavGraph(
             navController = navController,
             startDestination = Screen.Home.route,
-            modifier = Modifier.padding(paddingValues),
-            intakes = intakes,
-            onUpdateIntakes = { intakes = it }
+            modifier = Modifier.padding(paddingValues)
         )
     }
 }

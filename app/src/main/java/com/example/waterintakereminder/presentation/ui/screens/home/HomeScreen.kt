@@ -11,60 +11,50 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.waterintakereminder.presentation.navigation.Screen
 import com.example.waterintakereminder.presentation.ui.screens.home.component.WaterInputField
 import com.example.waterintakereminder.presentation.ui.screens.home.component.WaterIntakeCard
 import com.example.waterintakereminder.presentation.ui.screens.home.component.QuickAddButtons
 import com.example.waterintakereminder.data.model.WaterIntake
-import java.text.SimpleDateFormat
-import java.util.*
 import com.example.waterintakereminder.presentation.ui.components.WaterAppBar
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.derivedStateOf
+import com.example.waterintakereminder.presentation.view_model.home.HomeViewModel
+import com.example.waterintakereminder.presentation.view_model.home.HomeUiState
+import com.example.waterintakereminder.presentation.view_model.home.HomeNavigationEvent
 
 @Composable
 fun HomeScreen(
-    navController: NavController,
-    intakes: List<WaterIntake>,
-    onUpdateIntakes: (List<WaterIntake>) -> Unit
+    viewModel: HomeViewModel,
+    navController: NavController
 ) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val hydrationTip by viewModel.hydrationTip.collectAsStateWithLifecycle()
+
     var inputText by rememberSaveable { mutableStateOf("") }
     var inputError by remember { mutableStateOf(false) }
 
-    val totalWater = intakes.sumOf { it.amountMl }
-    val dailyGoalProgress = (totalWater / 2000f).coerceAtMost(1f)
-    val remainingWater = (2000 - totalWater).coerceAtLeast(0)
-    val waterCount = intakes.size
-    val averageAmount = if (intakes.isNotEmpty()) intakes.sumOf { it.amountMl } / intakes.size else 0
-
-    val onAddWater = { amount: Int ->
-        val currentTime = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
-        val newId = (intakes.maxOfOrNull { it.id } ?: 0) + 1
-        val newIntake = WaterIntake(newId, amount, currentTime, true)
-        onUpdateIntakes(intakes + newIntake)
-    }
-
-    val onToggleDrank = { id: Int ->
-        val updatedIntakes = intakes.map {
-            if (it.id == id) it.copy(isDrank = !it.isDrank) else it
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                is HomeNavigationEvent.NavigateToDetail -> {
+                    navController.navigate(Screen.DetailWithArg.passData(event.intake))
+                }
+            }
         }
-        onUpdateIntakes(updatedIntakes)
     }
 
-    val onDeleteIntake = { id: Int ->
-        onUpdateIntakes(intakes.filter { it.id != id })
-    }
-
-    val onNavigateToDetail = { intake: WaterIntake ->
-        navController.navigate(Screen.DetailWithArg.passData(intake))
-    }
+    val totalWater = (uiState as? HomeUiState.Success)?.intakes?.sumOf { it.amountMl } ?: 0
+    val waterCount = (uiState as? HomeUiState.Success)?.intakes?.size ?: 0
+    val averageAmount = if (waterCount > 0) totalWater / waterCount else 0
 
     val onWaterSubmit = {
         val amount = inputText.toIntOrNull()
         if (amount != null && amount > 0) {
-            onAddWater(amount)
+            viewModel.addWater(amount)
             inputText = ""
             inputError = false
         } else {
@@ -72,22 +62,60 @@ fun HomeScreen(
         }
     }
 
-    HomeScreenStateless(
-        intakes = intakes,
-        totalWater = totalWater,
-        dailyGoalProgress = dailyGoalProgress,
-        remainingWater = remainingWater,
-        waterCount = waterCount,
-        averageAmount = averageAmount,
-        inputValue = inputText,
-        inputError = inputError,
-        onAddWater = onAddWater,
-        onToggleDrank = onToggleDrank,
-        onDeleteIntake = onDeleteIntake,
-        onNavigateToDetail = onNavigateToDetail,
-        onInputValueChange = { inputText = it },
-        onWaterSubmit = onWaterSubmit
-    )
+    when (uiState) {
+        is HomeUiState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+        is HomeUiState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Error: ${(uiState as HomeUiState.Error).message}")
+                    Button(onClick = { viewModel.resetUiState() }) {
+                        Text("Retry")
+                    }
+                }
+            }
+        }
+        is HomeUiState.Success -> {
+            val intakes = (uiState as HomeUiState.Success).intakes
+            val dailyGoalProgress = (totalWater / 2000f).coerceAtMost(1f)
+            val remainingWater = (2000 - totalWater).coerceAtLeast(0)
+
+            HomeScreenStateless(
+                intakes = intakes,
+                totalWater = totalWater,
+                dailyGoalProgress = dailyGoalProgress,
+                remainingWater = remainingWater,
+                waterCount = waterCount,
+                averageAmount = averageAmount,
+                inputValue = inputText,
+                inputError = inputError,
+                hydrationTip = hydrationTip,
+                onAddWater = { viewModel.addWater(it) },
+                onToggleDrank = { viewModel.toggleDrankStatus(it) },
+                onDeleteIntake = { viewModel.deleteIntake(it) },
+                onNavigateToDetail = { viewModel.navigateToDetail(it) },
+                onInputValueChange = { inputText = it },
+                onWaterSubmit = onWaterSubmit
+            )
+        }
+        else -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("Initializing...")
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -101,6 +129,7 @@ private fun HomeScreenStateless(
     averageAmount: Int,
     inputValue: String,
     inputError: Boolean,
+    hydrationTip: String,
     onAddWater: (Int) -> Unit,
     onToggleDrank: (Int) -> Unit,
     onDeleteIntake: (Int) -> Unit,
@@ -149,6 +178,20 @@ private fun HomeScreenStateless(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            if (hydrationTip.isNotEmpty()) {
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer)
+                ) {
+                    Text(
+                        text = hydrationTip,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(12.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)

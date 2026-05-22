@@ -18,14 +18,13 @@ import com.example.waterintakereminder.presentation.ui.screens.home.StatsGridScr
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationTipsScreen
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationInspirationScreen
 import com.example.waterintakereminder.data.model.WaterIntake
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: String = Screen.Home.route,
-    intakes: List<WaterIntake>,
-    onUpdateIntakes: (List<WaterIntake>) -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -42,15 +41,15 @@ fun NavGraph(
 
         composable(route = Screen.Home.route) {
             HomeScreen(
-                navController = navController,
-                intakes = intakes,
-                onUpdateIntakes = onUpdateIntakes
+                viewModel = hiltViewModel(),
+                navController = navController
             )
         }
 
         composable(route = Screen.AllIntakes.route) {
             ListScreen(
-                onItemClick = { amount ->
+                viewModel = hiltViewModel(),
+                onNavigateToDetail = { amount ->
                     navController.navigate(Screen.DetailWithArg.passData(WaterIntake(0, amount, "", false)))
                 }
             )
@@ -84,13 +83,17 @@ fun NavGraph(
         }
 
         composable(route = Screen.Settings.route) {
-            SettingsScreen()
+            SettingsScreen(
+                viewModel = hiltViewModel()
+            )
         }
 
         composable(route = Screen.Profile.route) {
-            ProfileScreen(navController = navController)
+            ProfileScreen(
+                viewModel = hiltViewModel(),
+                navController = navController
+            )
         }
-
         composable(route = Screen.Achievements.route) {
             AchievementsHorizontalGridScreen(
                 onNavigateBack = { navController.popBackStack() }
@@ -98,11 +101,16 @@ fun NavGraph(
         }
 
         composable(route = Screen.Stats.route) {
-            StatsGridScreen()
+            StatsGridScreen(
+                viewModel = hiltViewModel()
+            )
         }
 
         composable(route = Screen.Tips.route) {
-            HydrationTipsScreen()
+            HydrationTipsScreen(
+                viewModel = hiltViewModel(),
+                navController = navController
+            )
         }
 
         composable(route = Screen.Inspiration.route) {
