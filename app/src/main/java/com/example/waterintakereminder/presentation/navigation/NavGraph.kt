@@ -19,6 +19,7 @@ import com.example.waterintakereminder.presentation.ui.screens.home.HydrationTip
 import com.example.waterintakereminder.presentation.ui.screens.home.HydrationInspirationScreen
 import com.example.waterintakereminder.data.model.WaterIntake
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.waterintakereminder.presentation.ui.screens.home.CloudHomeScreen
 
 @Composable
 fun NavGraph(
@@ -115,6 +116,12 @@ fun NavGraph(
 
         composable(route = Screen.Inspiration.route) {
             HydrationInspirationScreen()
+        }
+        composable(route = "cloud_home/{userId}") {
+            CloudHomeScreen(
+                userId = it.arguments?.getString("userId") ?: "",
+                navController = navController
+            )
         }
     }
 }
