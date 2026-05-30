@@ -1,12 +1,15 @@
 package com.example.waterintakereminder.presentation.ui.screens.home.component
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
@@ -15,6 +18,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.RadioButtonUnchecked
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 
 @Composable
 fun WaterIntakeCard(
@@ -27,11 +33,26 @@ fun WaterIntakeCard(
     onDelete: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val elevation by animateDpAsState(
+        targetValue = if (isDrank) 4.dp else 0.dp,
+        animationSpec = tween(durationMillis = 300),
+        label = "elevation"
+    )
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clickable { onClick(id) }
+            .animateContentSize(),
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isDrank) {
+                MaterialTheme.colorScheme.primaryContainer
+            } else {
+                MaterialTheme.colorScheme.surfaceVariant
+            }
+        )
     ) {
         Row(
             modifier = Modifier

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "538063234487",
+    "project_id": "waterintakereminder11",
+    "storage_bucket": "waterintakereminder11.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:538063234487:android:5bbdced4eb7b11fa977432",
+        "android_client_info": {
+          "package_name": "com.example.waterintakereminder"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "538063234487-tlcsd8j6vk3qrikm64qlsb16si0bnsuc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.waterintakereminder",
+            "certificate_hash": "faae64164fed3059292135feaab793db1e11cdcc"
+          }
+        },
+        {
+          "client_id": "538063234487-7p73c1df840ufhf91qp07fi19l93q95j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQJGKkXr-IiAjO_OyH2_ry2eZu8w5-ELw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "538063234487-7p73c1df840ufhf91qp07fi19l93q95j.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
