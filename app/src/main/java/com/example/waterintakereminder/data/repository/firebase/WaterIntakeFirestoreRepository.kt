@@ -9,4 +9,5 @@ interface WaterIntakeFirestoreRepository {
     suspend fun addWaterIntake(amountMl: Int, time: String, userId: String): Result<Unit>
     suspend fun toggleWaterIntake(intakeId: String, isDrank: Boolean, userId: String): Result<Unit>
     suspend fun deleteWaterIntake(intakeId: String, userId: String): Result<Unit>
+    suspend fun exportWaterIntakes(intakes: List<WaterIntake>): Result<String>
 }

@@ -25,6 +25,12 @@ class CloudHomeViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Init)
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private val _exportMessage = MutableStateFlow<String?>(null)
+    val exportMessage: StateFlow<String?> = _exportMessage.asStateFlow()
+
+    private val _exportError = MutableStateFlow<String?>(null)
+    val exportError: StateFlow<String?> = _exportError.asStateFlow()
+
     private var currentUserId: String = ""
 
     fun setUserId(userId: String) {
@@ -80,6 +86,25 @@ class CloudHomeViewModel @Inject constructor(
                 _uiState.value = HomeUiState.Error(e.message ?: "Failed to load intakes from cloud")
             }
         }
+    }
+
+    fun exportWaterIntakes() {
+        viewModelScope.launch {
+            val currentState = _uiState.value
+            if (currentState is HomeUiState.Success) {
+                val result = firestoreRepository.exportWaterIntakes(currentState.intakes)
+                result.onSuccess { fileUri ->
+                    _exportMessage.value = "Exported to Downloads folder"
+                }.onFailure { exception ->
+                    _exportError.value = exception.message ?: "Export failed"
+                }
+            }
+        }
+    }
+
+    fun clearExportState() {
+        _exportMessage.value = null
+        _exportError.value = null
     }
 
     fun createWaterIntake(amount: Int) {
